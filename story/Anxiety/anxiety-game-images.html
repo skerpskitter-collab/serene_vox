@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>极度焦虑：重产之重</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: #e0e0e0;
+  line-height: 1.8;
+}
+#story {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 80px 20px 40px;
+  min-height: 100vh;
+}
+.passage {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.scene-image {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.scene-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+.passage h1 { 
+  font-size: 1.5em; 
+  margin-bottom: 1em;
+  color: #00d9ff;
+}
+.passage p { 
+  margin-bottom: 1em; 
+  text-align: justify;
+}
+.choice {
+  display: block;
+  color: #00d9ff;
+  text-decoration: none;
+  padding: 12px 20px;
+  margin: 10px 0;
+  background: rgba(0,217,255,0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(0,217,255,0.25);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.choice:hover {
+  background: rgba(0,217,255,0.18);
+  border-color: #00d9ff;
+  transform: translateX(5px);
+}
+.variable-bar {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 20px 0;
+  font-size: 0.9em;
+  font-family: "SF Mono", Monaco, monospace;
+  border-left: 3px solid #00d9ff;
+}
+.variable-change {
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+.variable-change.warning {
+  background: rgba(255,193,7,0.15);
+  border-left: 3px solid #ffc107;
+}
+.variable-change.danger {
+  background: rgba(244,67,54,0.15);
+  border-left: 3px solid #f44336;
+}
+.variable-change.positive {
+  background: rgba(76,175,80,0.15);
+  border-left: 3px solid #4caf50;
+}
+.crisis-alert, .power-alert, .greed-alert, .awakening-alert {
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.crisis-alert {
+  background: rgba(244,67,54,0.2);
+  border: 1px solid #f44336;
+}
+.power-alert {
+  background: rgba(255,152,0,0.2);
+  border: 1px solid #ff9800;
+}
+.greed-alert {
+  background: rgba(255,193,7,0.2);
+  border: 1px solid #ffc107;
+}
+.awakening-alert {
+  background: rgba(0,217,255,0.2);
+  border: 1px solid #00d9ff;
+}
+.final-stats {
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
+  padding: 25px;
+  margin: 20px 0;
+}
+.final-stats h3 {
+  color: #00d9ff;
+  margin-bottom: 15px;
+}
+.final-stats p { margin: 8px 0; }
+.stat-good { color: #4caf50; }
+.stat-warning { color: #ff9800; }
+.awakening-high { background: rgba(0,217,255,0.15); border-radius: 12px; padding: 20px; margin: 15px 0; border: 1px solid rgba(0,217,255,0.3); }
+.awakening-medium { background: rgba(76,175,80,0.15); border-radius: 12px; padding: 20px; margin: 15px 0; border: 1px solid rgba(76,175,80,0.3); }
+.awakening-low { background: rgba(255,193,7,0.15); border-radius: 12px; padding: 20px; margin: 15px 0; border: 1px solid rgba(255,193,7,0.3); }
+.awakening-seed { background: rgba(156,39,176,0.15); border-radius: 12px; padding: 20px; margin: 15px 0; border: 1px solid rgba(156,39,176,0.3); }
+.lesson-summary, .final-message { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 20px; margin: 15px 0; }
+.lesson-summary ul { margin-left: 20px; }
+#interface-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.85);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+#interface-bar .title { color: #00d9ff; font-size: 1.1em; font-weight: 500; }
+#interface-bar .restart { 
+  color: #e0e0e0; 
+  text-decoration: none; 
+  padding: 6px 16px; 
+  background: rgba(255,255,255,0.1); 
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+#interface-bar .restart:hover { background: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+<div id="interface-bar">
+  <span class="title">极度焦虑：重产之重</span>
+  <a class="restart" href="javascript:location.reload()">重新开始</a>
+</div>
+<div id="story"><div class="passage"><p>加载中...</p></div></div>
+
+<script>
+const PASSAGES = [{"pid": 1, "name": "StoryTitle", "content": "极度焦虑：重产之重 (图文版)\n", "tags": []}, {"pid": 2, "name": "StoryData", "content": "{\n\"ifid\": \"A4B3C2D1-E5F6-4A3B-8C7D-E9F0A1B2C3D4\",\n\"format\": \"SugarCube\",\n\"format-version\": \"2.36.1\",\n\"start\": \"Game_Init\"\n}\n", "tags": []}, {"pid": 3, "name": "Game_Init", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/awakening/800/400\" alt=\"觉醒之路\"></div>\n\n<<set $anxiety to 50>>\\\n<<set $greed to 50>>\\\n<<set $power to 50>>\\\n<<set $awakening to 0>>\\\n<<set $path to \"unknown\">>\\\n\n你正准备开始一段特殊的旅程。\n\n这不仅仅是一个游戏，而是一面映射内心的镜子。\n\n在接下来的故事中，你的每一个选择都会影响三个核心数值：\n- **安全焦虑值**：你对安全感的渴求程度\n- **欲望贪婪值**：你对成果和利益的执着\n- **权力欲望值**：你控制他人和局面的冲动\n\n这些数值会在选择中悄然变化，最终决定你觉醒的方式。\n\n<div class=\"variable-bar\">\n当前状态：\n安全焦虑：<$anxiety>\n欲望贪婪：<$greed>\n权力欲望：<$power>\n</div>\n\n[[开始你的觉醒之旅->Act1_Start]]\n", "tags": []}, {"pid": 4, "name": "Act1_Start", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/office-sunset/800/400\" alt=\"黄昏办公室\"></div>\n\n中央商务区的黄昏总是带着一种铁锈味。\n你站在35楼的办公室窗前，指尖无意识地揉搓着那份厚达两百页的《项目尽职调查报告》。这是你接手这个重资产投资项目的第七天。\n\n项目涉及数亿规模的土地和设备，一旦决策失误，不仅是你的职业生涯，整个公司的现金流都会被拖入深渊。\n你的心脏在胸腔里搏动得有些生疼，每一次跳动都仿佛在提醒你：时间不多了。\n\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[坐回工位，继续核对数据->Act1_Desk_Anxiety]]\n[[去茶水间倒杯咖啡，平复呼吸->Act1_Coffee_Break]]\n", "tags": []}, {"pid": 5, "name": "Act1_Desk_Anxiety", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/desk-night/800/400\" alt=\"深夜办公桌\"></div>\n\n屏幕的光打在你苍白的脸上。Excel表格里的数字密密麻麻，像是一群正在搬运尸体的蚂蚁。\n你试图寻找逻辑，但脑海中挥之不去的是下午团队会议上，老陈那轻蔑的眼神。\n\n他是项目的元老，对你这个\"空降兵\"充满了抵触。\n\"这种重资产项目，不是靠几张表格就能算出来的。\"他的话像一根刺，扎在你的神经末梢。\n\n<<set $anxiety += 5>>\\\n<<set $power += 3>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5，权力欲望值上升 +3</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[重新审视老陈提出的风险点->Act1_Team_Friction]]\n[[强迫自己忽略干扰，继续计算->Act1_Internal_Pressure]]\n", "tags": []}, {"pid": 6, "name": "Act1_Coffee_Break", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/coffee-break/800/400\" alt=\"茶水间\"></div>\n\n茶水间很安静，只有制冰机偶尔发出的碎裂声。\n你握着杯子，看着水流注入，热气氤氲了你的眼镜。你摘下眼镜，揉了揉肿胀的双眼。\n\n镜子里的你，眼神焦虑，眉心紧锁。你发现自己甚至无法控制手指的轻微颤抖。\n这时，你听到门外传来团队成员的低声交谈。\n\"……他真的行吗？这项目这么沉，万一砸了，咱们今年的奖金全没戏。\"\n\n<<if $anxiety gte 60>>\\\n你感到一阵强烈的不安，心跳加速。\n<<else>>\\\n你深吸一口气，试图保持冷静。\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[推门出去，严肃地打断谈话->Act1_Confrontation]]\n[[等他们离开，躲在阴影里自省->Act1_Avoidance]]\n", "tags": []}, {"pid": 7, "name": "Act1_Team_Friction", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/documents/800/400\" alt=\"文件与报告\"></div>\n\n你翻开老陈在报告上标注的那一页。他认为当地的政策变动风险被严重低估了。\n如果他是对的，那么现在的估值模型就是一堆废纸。\n\n焦虑感像潮水一样涌上来，几乎要淹没你的理智。\n你拿起手机，想给之前的导师打个电话，但最后还是放下了。\n\n<<set $anxiety += 3>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +3</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[直接给老陈发消息，约他私下对账->Act1_Private_Meeting]]\n[[等到明天开会再当众解决矛盾->Act1_Delay_Decision]]\n", "tags": []}, {"pid": 8, "name": "Act1_Private_Meeting", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/phone-message/800/400\" alt=\"手机消息\"></div>\n\n你颤抖着手指发出了消息。老陈回得很快，只有两个字：\"没空。\"\n这一刻，你感到了极度的被动。你发现自己根本无法掌控这个团队的关键人物。\n\n<<set $power += 5>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 权力欲望值上升 +5，安全焦虑值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[继续加班，试图找出老陈的漏洞->Act1_Late_Night_Work]]\n[[去接听那个一直响个不停的内线电话->Act1_Phone_Call]]\n", "tags": []}, {"pid": 9, "name": "Act1_Delay_Decision", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/dark-office/800/400\" alt=\"黑暗办公室\"></div>\n\n你决定把问题推给明天。但这种\"推迟\"并没有带来轻松，反而让焦虑在阴影里野蛮生长。\n你坐在黑暗的办公室里，想象着明天会上老陈可能的刁难，以及主席严厉的目光。\n\n<<set $anxiety += 5>>\\\n<<set $greed += 3>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5，欲望贪婪值上升 +3</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[无法忍受，开始疯狂核对IRR模型->Act1_Internal_Pressure]]\n[[强迫自己提前离开公司逃避压力->Act1_Act2_Hook]]\n", "tags": []}, {"pid": 10, "name": "Act1_Internal_Pressure", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/excel-stress/800/400\" alt=\"数据与压力\"></div>\n\n你盯着那些IRR（内部收益率）数据。数字是冰冷的，但你总觉得哪里不对劲。\n这种不确定感让你感到窒息。你接手这个项目是为了证明自己，但现在，它正变成一个吞噬你的黑洞。\n这时，桌上的内线电话响了，是投资委员会主席。\n\n<<set $greed += 5>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 欲望贪婪值上升 +5，安全焦虑值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[接听电话，强装镇定地汇报进展->Act1_Phone_Call]]\n[[任由铃声响着，盯着屏幕陷入瘫痪->Act1_Phone_Ignore]]\n", "tags": []}, {"pid": 11, "name": "Act1_Phone_Ignore", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/phone-ring/800/400\" alt=\"电话铃声\"></div>\n\n电话铃声断了又响，响了又断。你盯着闪烁的指示灯，觉得那是一只怪兽的眼睛。\n你不敢接，你害怕听到那个要求\"绝对成果\"的声音。\n\n<<set $anxiety += 8>>\\\n<<set $power -= 3>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值大幅上升 +8，权力欲望值下降 -3</div>\n\n<<if $anxiety gte 80>>\\\n<div class=\"crisis-alert\">\n🚨 警告：你的安全焦虑值已达到危险水平！\n身体正在向你发出求救信号……\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[逃进洗手间试图用冷水洗脸->Act1_Coffee_Break]]\n[[最终只能在负罪感中开始熬夜->Act1_Late_Night_Work]]\n", "tags": []}, {"pid": 12, "name": "Act1_Phone_Call", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/business-call/800/400\" alt=\"商务电话\"></div>\n\n\"进展如何？\"主席的声音低沉而有力。\n\"一切都在按计划进行。\"你听到自己说出了这句完美的谎言。\n\"很好。下周一的投委会，我要看到最终结论。不容有失。\"\n\n<<set $anxiety += 8>>\\\n<<set $greed += 5>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值大幅上升 +8，欲望贪婪值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[为了圆谎，疯狂地开始通宵加班->Act1_Late_Night_Work]]\n[[放下电话，由于心虚感到心脏狂跳->Act1_Physical_Collapse]]\n", "tags": []}, {"pid": 13, "name": "Act1_Confrontation", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/confrontation/800/400\" alt=\"对峙\"></div>\n\n你猛地推开门。交谈声戛然而止。\n\"与其在这里猜测，不如把精力放在明天要交的设备清单上。\"你厉声说道。\n他们低着头散开了。你赢得了暂时的安静，但那种被孤立的冷意却更加彻骨。\n\n<<set $power += 8>>\\\n<<set $anxiety += 3>>\\\n<div class=\"variable-change warning\">⚠ 权力欲望值大幅上升 +8，安全焦虑值上升 +3</div>\n\n<<if $power gte 70>>\\\n<div class=\"power-alert\">\n⚡ 你的权力欲望正在膨胀……\n这种控制欲可能会让你做出危险的决定。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[回到办公室，锁上门独自工作->Act1_Late_Night_Work]]\n[[感到一阵虚脱，瘫坐在走廊长椅上->Act1_Physical_Collapse]]\n", "tags": []}, {"pid": 14, "name": "Act1_Avoidance", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/shadow/800/400\" alt=\"阴影\"></div>\n\n你缩在茶水间的转角处，直到脚步声远去。\n那种躲避的羞耻感和原本的焦虑混合在一起，形成了一种令人作呕的滋味。\n你意识到自己在这个团队中是如此格格不入。\n\n<<set $anxiety += 5>>\\\n<<set $power -= 5>>\\\n<div class=\"variable-change\">安全焦虑值上升 +5，权力欲望值下降 -5</div>\n\n<<set $awakening += 2>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +2（自省的力量）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[回办公室处理那份未完成的报告->Act1_Late_Night_Work]]\n[[现在就离开公司，试图通过睡眠逃离->Act1_Act2_Hook]]\n", "tags": []}, {"pid": 15, "name": "Act1_Late_Night_Work", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/midnight-work/800/400\" alt=\"午夜加班\"></div>\n\n凌晨两点。整栋大楼只有你这一层还亮着灯。\n每一个字都在嘲笑你的无能。你觉得如果你能控制住每一个变量，世界就会安全。\n但现实是，你连自己的呼吸都控制不住。\n\n<<set $anxiety += 5>>\\\n<<set $greed += 3>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5，欲望贪婪值上升 +3</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[试图寻找一个完美的参数平衡点->Act1_The_Trap]]\n[[在极度疲惫中伏案沉睡进入噩梦->Act1_Nightmare]]\n", "tags": []}, {"pid": 16, "name": "Act1_The_Trap", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/trap/800/400\" alt=\"陷阱\"></div>\n\n你试图在Excel里通过调整参数来获得一个\"好看\"的结果。\n你明明知道这是自欺欺人，但你太渴望那种\"掌控\"带来的安全感了。\n\n<<set $greed += 8>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change danger\">⚠ 欲望贪婪值大幅上升 +8，安全焦虑值上升 +5</div>\n\n<<if $greed gte 75>>\\\n<div class=\"greed-alert\">\n💰 你的欲望贪婪值已达到危险水平！\n你正在用虚假的数据欺骗自己……\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power>\n</div>\n\n[[盯着屏幕直到清晨的敲门声响起->Act1_Act2_Hook]]\n[[因为心虚和压力诱发了强烈的胃痛->Act1_Physical_Collapse]]\n", "tags": []}, {"pid": 17, "name": "Act1_Nightmare", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/nightmare/800/400\" alt=\"噩梦\"></div>\n\n你梦见自己在无尽的重型机械零件中下坠。\n老陈和主席在上方冷冷地看着你，他们手里拿着那个项目的判决书。\n你大喊着\"我可以控制它！\"，但那些铁块迅速崩塌，将你淹没。\n\n<<set $anxiety += 8>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值大幅上升 +8</div>\n\n<<set $awakening += 3>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +3（梦境的启示）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[从惊悚的噩梦中惊醒->Act1_Act2_Hook]]\n[[在梦中体验到彻底的毁灭与无力->Act1_Physical_Collapse]]\n", "tags": []}, {"pid": 18, "name": "Act1_Act2_Hook", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/crisis-morning/800/400\" alt=\"清晨危机\"></div>\n\n清晨，当你双眼通红地抬起头时。\n老陈面色铁青地站在门口，手里拿着一份刚刚打印出来的紧急传真。\n\"出事了。\"他只说了三个字。\n\n<<set $path to \"crisis\">>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[接过传真，面对破碎的现实->Act2_Start]]\n[[在那一瞬间，你甚至希望这只是另一个梦->Act2_Start]]\n", "tags": []}, {"pid": 19, "name": "Act1_Physical_Collapse", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/collapse/800/400\" alt=\"崩溃\"></div>\n\n你的视线开始模糊，胸口的压迫感让你无法呼吸。\n这不是普通的疲劳，这是身体在向你发出警告。\n你的\"安全中心\"正通过病痛告诉你：这种压力已经超负荷了。\n\n<<set $anxiety += 10>>\\\n<<set $awakening += 5>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值暴增 +10</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（身体的智慧）</div>\n\n<<if $anxiety gte 90>>\\\n<div class=\"crisis-alert\">\n🚨 身体崩溃警告！\n你正在接近极限，必须做出改变……\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[强撑着意识，等待命运的审判->Act2_Start]]\n[[在晕眩中跌入意识的深海->Act2_Start]]\n", "tags": []}, {"pid": 20, "name": "Act2_Start", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/bad-news/800/400\" alt=\"坏消息\"></div>\n\n传真纸上写着：合作方\"鼎盛重工\"内部资金链断裂，核心设备无限期延期交付。\n老陈冷笑一声：\"设备不到位，咱们的厂房就是一堆空壳，银行贷款利息每天都在烧钱。\"\n你感到一种被羞辱的愤怒，这种失控让你抓狂。\n\n<<set $anxiety += 5>>\\\n<<set $power += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5，权力欲望值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[立刻致电鼎盛老板，施加强硬威胁->Act2_Aggressive_Call]]\n[[召集法务团队，准备最严厉的法律诉讼->Act2_Legal_War]]\n", "tags": []}, {"pid": 21, "name": "Act2_Aggressive_Call", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/angry-call/800/400\" alt=\"愤怒的电话\"></div>\n\n\"王总，下周一如果看不到设备，我会动用我所有的资源封杀你。\"你咆哮道。\n对方传出一声凄凉的笑声：\"封杀？经理，我都要破产了，你觉得我还在乎名声吗？\"\n嘟——嘟—— 电话被挂断了。\n\n<<set $power += 10>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change danger\">⚠ 权力欲望值暴增 +10，安全焦虑值上升 +5</div>\n\n<<if $power gte 80>>\\\n<div class=\"power-alert\">\n⚡ 权力欲望失控！\n你正在被控制欲吞噬……\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[再次疯狂拨打，试图重新建立掌控->Act2_Power_Obsession]]\n[[愤怒地将手机摔在桌上发泄情绪->Act2_Team_Pressure]]\n", "tags": []}, {"pid": 22, "name": "Act2_Legal_War", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/legal/800/400\" alt=\"法律诉讼\"></div>\n\n\"我要申请财产保全，冻结他们所有的账户。\"你对法务部命令道。\n小李提醒你：\"经理，这可能会逼得他们直接申请破产，到那时候设备就彻底拿不回来了……\"\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[坚持强硬诉讼，不计后果地反击->Act2_Legal_Backfire]]\n[[在焦躁中拒绝听取建议，维持强硬立场->Act2_Anxiety_Spiral]]\n", "tags": []}, {"pid": 23, "name": "Act2_Power_Obsession", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/obsession/800/400\" alt=\"执念\"></div>\n\n你连续拨打了十几次，对方直接关机了。\n你觉得周围的一切都在和你作对。你认为只要你表现得足够强大，世界就必须顺从。\n这种\"权力中心\"的执念，正在把你推向毁灭。\n\n<<set $power += 10>>\\\n<<set $anxiety += 8>>\\\n<div class=\"variable-change danger\">⚠ 权力欲望值暴增 +10，安全焦虑值大幅上升 +8</div>\n\n<<set $path to \"power\">>\\\n\n<<if $power gte 90>>\\\n<div class=\"power-alert\">\n⚡ 权力欲望达到极限！\n你正在失去理智……\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在办公室大发雷霆，迁怒于下属->Act2_Team_Pressure]]\n[[策划一场私下的、不合规的\"突击搜证\"->Act2_Illegal_Move]]\n", "tags": []}, {"pid": 24, "name": "Act2_Team_Pressure", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/team-stress/800/400\" alt=\"团队压力\"></div>\n\n你对着团队吼道：\"所有人取消休假！去查鼎盛的所有黑料！\"\n你看到实习生被吓得眼眶泛红。你感觉到了威严，但你也感觉到了一种更深层的孤立。\n\n<<set $power += 5>>\\\n<<set $awakening += 2>>\\\n<div class=\"variable-change warning\">⚠ 权力欲望值上升 +5</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +2（意识到孤立）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[继续冷酷地要求他们明早交报告->Act2_Team_Revolt]]\n[[在他们惊恐的眼神中感到一丝自我厌恶->Act2_Anxiety_Spiral]]\n", "tags": []}, {"pid": 25, "name": "Act2_Legal_Backfire", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/backfire/800/400\" alt=\"事与愿违\"></div>\n\n由于你采取了激进的保全措施，鼎盛重工的最后现金流被锁死，工人们领不到工资开始闹事。\n对方甚至向行业协会投诉了你的职业操守，传言在业内疯传。\n\n<<set $power += 5>>\\\n<<set $greed += 5>>\\\n<<set $anxiety += 10>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值暴增 +10，权力欲望和贪婪各上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在绝望中试图寻找转机->Act2_Dark_Moment]]\n[[拒绝承认这是策略失误，继续寻找借口->Act2_Denial]]\n", "tags": []}, {"pid": 26, "name": "Act2_Illegal_Move", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/dangerous/800/400\" alt=\"危险举动\"></div>\n\n你私下雇佣公司去仓库拉走设备，结果爆发冲突。\n\"空降高管暴力抢夺资产\"的视频引爆了社交媒体。\n你坐在办公室内，看着不断上涨的点击量，手脚冰冷。\n\n<<set $power += 10>>\\\n<<set $anxiety += 10>>\\\n<<set $greed += 5>>\\\n<div class=\"variable-change danger\">⚠ 所有负面数值大幅上升！</div>\n\n<<set $path to \"illegal\">>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[等待总部的调查组剥夺你的权力->Act3_Start]]\n[[试图动用更多非法手段掩盖真相->Act2_Dark_Moment]]\n", "tags": []}, {"pid": 27, "name": "Act2_Anxiety_Spiral", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/spiral/800/400\" alt=\"焦虑漩涡\"></div>\n\n你感到耳鸣越来越严重。你发现你不仅控制不了项目，连自己的情绪和睡眠都控制不了。\n每一个试图掌控外部世界的努力，最终都变成了对内在平静的屠杀。\n\n<<set $anxiety += 10>>\\\n<<set $awakening += 3>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值暴增 +10</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +3（认识到无力）</div>\n\n<<set $path to \"anxiety\">>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在会议室枯坐到天亮感叹无力->Act2_Dark_Moment]]\n[[试图去寻找老陈，做最后的求助->Act2_Ask_Chen]]\n", "tags": []}, {"pid": 28, "name": "Act2_Team_Revolt", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/empty-office/800/400\" alt=\"空荡办公室\"></div>\n\n团队骨干集体请假或离职。\"经理，我们是来工作的，不是来当炮灰的。\"\n在这个最需要人的时候，你亲手拆掉了自己最后的堡垒。\n\n<<set $power -= 10>>\\\n<<set $anxiety += 10>>\\\n<<set $awakening += 5>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值暴增 +10，权力欲望值大幅下降 -10</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（意识到控制欲的代价）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[看着空荡荡的办公区陷入瘫痪->Act2_Dark_Moment]]\n[[疯狂地翻看招聘网站试图寻找替代者->Act2_Denial]]\n", "tags": []}, {"pid": 29, "name": "Act2_Ask_Chen", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/old-mentor/800/400\" alt=\"导师\"></div>\n\n老陈慢条斯理地喝着茶：\"你总想让世界顺着你的意思走。你非要去做那个上帝，结果把自己累成了鬼。\"\n\n<<set $awakening += 8>>\\\n<<set $power -= 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +8</div>\n<div class=\"variable-change\">权力欲望值下降 -5</div>\n\n<<if $awakening gte 20>>\\\n<div class=\"awakening-alert\">\n💡 觉醒的种子开始发芽……\n你开始看到控制欲的本质。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[反驳老陈的消极，认为他不可理喻->Act2_Denial]]\n[[沉默不语，感受到一种从未有过的虚无->Act2_Dark_Moment]]\n", "tags": []}, {"pid": 30, "name": "Act2_Denial", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/denial/800/400\" alt=\"否认\"></div>\n\n\"不，不是我的错！是这个世界太混乱！\"\n你坚信，只要你再强硬一点，就能翻盘。但现实的裂痕已经大到无法修补。\n\n<<set $power += 5>>\\\n<<set $anxiety += 5>>\\\n<<set $awakening -= 3>>\\\n<div class=\"variable-change danger\">⚠ 权力欲望值上升 +5，安全焦虑值上升 +5</div>\n<div class=\"variable-change negative\">✨ 觉醒值下降 -3（自我欺骗）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[由于极度抗拒现实，导致精神崩溃->Act2_Dark_Moment]]\n[[在偏执中寻找下一个\"假想敌\"->Act2_Dark_Moment]]\n", "tags": []}, {"pid": 31, "name": "Act2_Dark_Moment", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/darkness/800/400\" alt=\"至暗时刻\"></div>\n\n投资委员会暂停资金拨付。项目已经变成了一具冰冷的尸体。\n而你，就是那个亲手埋葬它的人。\n\n<<set $anxiety += 5>>\\\n<<set $awakening += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（直面失败）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[走向那个必然的结局：被正式解聘->Act3_Start]]\n[[在绝望的深渊里迎接最后的审判->Act3_Start]]\n", "tags": []}, {"pid": 32, "name": "Act3_Start", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/home-alone/800/400\" alt=\"独自在家\"></div>\n\n你被停职了，坐在自家客厅的地板上，窗帘紧闭。\n你曾试图掌控数亿资产，现在连下楼扔垃圾的力气都没有。\n\n<<set $greed -= 10>>\\\n<div class=\"variable-change\">欲望贪婪值下降 -10（外在刺激消失）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[盯着天花板上的裂缝发呆->Act3_The_Crack]]\n[[去洗手间洗把脸，看镜子里的废墟->Act3_The_Mirror]]\n", "tags": []}, {"pid": 33, "name": "Act3_The_Crack", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/ceiling/800/400\" alt=\"天花板\"></div>\n\n你盯着那道细长的裂缝。它一直都在，只是你以前从未观察过它。\n当你忙着掌控利润时，你对身边最真实的存在视而不见。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（观察当下的力量）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[试图闭上眼强迫自己陷入睡眠->Act3_Insomnia]]\n[[起身去翻找那个落满灰尘的书架->Act3_Old_Books]]\n", "tags": []}, {"pid": 34, "name": "Act3_The_Mirror", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/mirror/800/400\" alt=\"镜子\"></div>\n\n镜子里的那个人让你感到陌生。你自问：如果失去了这个头衔，你还是谁？\n这个问题让你感到一阵剧烈的头晕。\n\n<<set $awakening += 5>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（身份的质问）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[低头干呕，感受到生理性的抗拒->Act3_Physical_Reaction]]\n[[撑着洗手台，试图尝试深呼吸->Act3_Breathing_Attempt]]\n", "tags": []}, {"pid": 35, "name": "Act3_Insomnia", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/insomnia/800/400\" alt=\"失眠\"></div>\n\n脑海中不断回放那些指责的声音。这种\"反刍\"让你陷入了更深的内耗。\n你发现你连这个折磨自己的大脑都控制不了。\n\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[去阳台抽根烟，看着深夜的街道->Act3_Balcony_Night]]\n[[打开手机，麻木地刷着各种恶意评论->Act3_Digital_Numbness]]\n", "tags": []}, {"pid": 36, "name": "Act3_Digital_Numbness", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/social-media/800/400\" alt=\"社交媒体\"></div>\n\n你在社交媒体上不断搜索自己的名字。\n每一条负面评价都像毒药。你发现你依然在渴求外界的肯定。\n\n<<set $greed += 5>>\\\n<<set $anxiety += 8>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值大幅上升 +8，欲望贪婪值上升 +5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[感受到一种被全世界抛弃的绝望->Act3_The_Collapse]]\n[[在彻底的疲惫中丢掉手机，回归寂静->Act3_Inner_Question]]\n", "tags": []}, {"pid": 37, "name": "Act3_Old_Books", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/books/800/400\" alt=\"书籍\"></div>\n\n你翻出了那本《论生命的安宁》：\"痛苦的根源在于，人们总是试图控制那些他们根本无法控制的事情。\"\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，安全焦虑值下降 -5</div>\n\n<<if $awakening gte 30>>\\\n<div class=\"awakening-alert\">\n💡 觉醒的光芒开始照亮内心……\n你找到了一把解开痛苦的钥匙。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[认为这些是虚伪的鸡汤，随手扔掉->Act3_Resist_Philosophy]]\n[[坐在地上，如获至宝地读下去->Act3_Stoic_Seed]]\n", "tags": []}, {"pid": 38, "name": "Act3_Physical_Reaction", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/pain/800/400\" alt=\"痛苦\"></div>\n\n焦虑转化成了肉体的病变。你瘫坐在瓷砖地上，感到冰凉透进脊椎。\n\n<<set $anxiety += 5>>\\\n<<set $awakening += 3>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +3（身体作为老师）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[给最亲近的家人打个求助电话->Act3_Family_Call]]\n[[蜷缩在黑暗的角落里，等待消失->Act3_The_Collapse]]\n", "tags": []}, {"pid": 39, "name": "Act3_Breathing_Attempt", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/breath/800/400\" alt=\"呼吸\"></div>\n\n吸气。呼气。但每当你试图平静，焦虑就跳出来攻击你。\n你发现你连这几秒钟的呼吸都\"控制\"得极其笨拙。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（尝试放下控制）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[继续尝试呼吸，直到平静一点点->Act3_Small_Peace]]\n[[放弃这种无力的尝试，认为没救了->Act3_Resist_Philosophy]]\n", "tags": []}, {"pid": 40, "name": "Act3_Balcony_Night", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/balcony-night/800/400\" alt=\"阳台夜景\"></div>\n\n如果你不再试图去修正那个已经毁掉的项目，如果你只是……接受它，会怎么样？\n这个念头让你感到惊恐，因为那意味着\"承认失败\"。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（质疑控制的必要）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[继续沉浸在失败的羞耻感中->Act3_The_Collapse]]\n[[尝试用\"消极想象\"直面最坏的结果->Act3_Negative_Visualization]]\n", "tags": []}, {"pid": 41, "name": "Act3_Stoic_Seed", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/wisdom/800/400\" alt=\"智慧\"></div>\n\n你突然发现，你所有的痛苦，都来自于你那双试图抓牢虚空的手。\n当你放下\"必须成功\"的条件，痛苦似乎减轻了。\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 10>>\\\n<<set $power -= 10>>\\\n<<set $greed -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10</div>\n<div class=\"variable-change\">所有负面值下降 -10</div>\n\n<<if $awakening gte 40>>\\\n<div class=\"awakening-alert\">\n💡 你正在经历意识的转变……\n执念开始松动，自由正在靠近。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[思考：那我真正能掌控的是什么？->Act3_Inner_Question]]\n[[自嘲：这些道理懂了也改变不了现实->Act3_Resist_Philosophy]]\n", "tags": []}, {"pid": 42, "name": "Act3_Family_Call", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/family/800/400\" alt=\"家人\"></div>\n\n\"妈，我可能……把工作丢了。\"\n\"丢了就丢了，回来吃顿饭。你太累了，孩子。\"\n挂掉电话，你发现你的执念在亲情面前，第一次显得那么不真实。\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 10>>\\\n<<set $power -= 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，安全焦虑值下降 -10</div>\n<div class=\"variable-change\">权力欲望值下降 -5</div>\n\n<<if $awakening gte 35>>\\\n<div class=\"awakening-alert\">\n💡 亲情的温暖融化了执念的坚冰……\n你开始意识到什么才是真正重要的。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[静静坐着，感受这份不再紧绷的片刻->Act3_Small_Peace]]\n[[依然觉得无颜见人，陷入自我厌恶->Act3_The_Collapse]]\n", "tags": []}, {"pid": 43, "name": "Act3_Negative_Visualization", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/meditation/800/400\" alt=\"冥想\"></div>\n\n想象最坏的情况：被开除，行业封杀，积蓄耗尽。\n当你直面这些时，你发现：现在的你，依然在这里，呼吸着。\n恐惧的毒性似乎降低了。\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，安全焦虑值下降 -5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[感受到一种微弱但清晰的解脱->Act3_Inner_Question]]\n[[试图在废墟上重新定义\"我是谁\"->Act3_Inner_Question]]\n", "tags": []}, {"pid": 44, "name": "Act3_Small_Peace", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/peace/800/400\" alt=\"平静\"></div>\n\n你发现即使整个世界都否定了你，这个物理维度的当下，依然是安稳的。\n这是你进入焦虑以来，第一次感受到\"当下\"的力量。\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，安全焦虑值下降 -10</div>\n\n<<if $awakening gte 45>>\\\n<div class=\"awakening-alert\">\n💡 当下的力量正在显现……\n你已经找到了觉醒的入口。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[顺着这份感觉，思考自我的边界->Act4_Start]]\n[[在这份微光中寻找重新出发的勇气->Act4_Start]]\n", "tags": []}, {"pid": 45, "name": "Act3_The_Collapse", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/tears/800/400\" alt=\"崩溃\"></div>\n\n你最终崩溃了，在黑暗中大哭，直到不再有力气挣扎。\n这种彻底的绝望，其实是\"旧我\"在死去的标志。\n\n<<set $awakening += 5>>\\\n<<set $anxiety += 5>>\\\n<div class=\"variable-change warning\">⚠ 安全焦虑值上升 +5</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（绝望中的转机）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在清冷的黎明中睁开眼->Act4_Start]]\n[[在灰烬中感受到一丝奇异的平静->Act4_Start]]\n", "tags": []}, {"pid": 46, "name": "Act3_Inner_Question", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/question/800/400\" alt=\"质问\"></div>\n\n你问自己：如果我不再通过外部的肯定来寻找安全感，我会是谁？\n你开始意识到，\"努力掌控一切\"其实是一场必输的赌局。\n\n<<set $awakening += 10>>\\\n<<set $power -= 10>>\\\n<<set $greed -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10</div>\n<div class=\"variable-change\">权力欲望和贪婪各下降 -10</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[等待思想在寂静中蜕变->Act4_Start]]\n[[记录下这一刻对掌控欲的反思->Act4_Start]]\n", "tags": []}, {"pid": 47, "name": "Act3_Resist_Philosophy", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/struggle/800/400\" alt=\"挣扎\"></div>\n\n你依然选择在愤怒中折磨自己。直到高烧退去后，你发现世界并无改变。\n这种彻底的无力感，最终成了你最深刻的老师。\n\n<<set $anxiety += 10>>\\\n<<set $awakening += 3>>\\\n<div class=\"variable-change danger\">⚠ 安全焦虑值暴增 +10</div>\n<div class=\"variable-change positive\">✨ 觉醒值上升 +3（痛苦作为老师）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在虚弱中接受现实的空壳->Act4_Start]]\n[[被迫放下那些沉重的心理负担->Act4_Start]]\n", "tags": []}, {"pid": 48, "name": "Act4_Start", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/city-night/800/400\" alt=\"城市夜景\"></div>\n\n你最后一次刷开了公司顶层的大门。\n深夜两点的办公室，寂静得像一座深海墓穴。\n你把额头贴在玻璃上，看着窗外璀璨的虚空。\n\n<<if $awakening gte 40>>\\\n你感到一种奇异的平静。觉醒的种子已经发芽。\n<<elseif $awakening gte 20>>\\\n你感到混乱与平静交织。觉醒正在进行中。\n<<else>>\\\n你依然被焦虑和执念所困。但你已经踏上了觉醒之路。\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[凝视车流，回溯焦虑的源头->Act4_Trace_Addiction]]\n[[闭上眼，感受呼吸与寂静的共振->Act4_Stillness_Insight]]\n", "tags": []}, {"pid": 49, "name": "Act4_Trace_Addiction", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/addiction/800/400\" alt=\"成瘾\"></div>\n\n你审视那股焦虑。它来自于你内心那个贪婪的\"安全中心\"。\n你像一个毒瘾发作者一样，疯狂抓取外界的保证来填充内心的空洞。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（识别成瘾机制）</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[辨识这种成瘾需求的虚幻性->Act4_Emptiness_Realization]]\n[[反思这种病态\"掌控\"背后的代价->Act4_Price_Of_Control]]\n", "tags": []}, {"pid": 50, "name": "Act4_Stillness_Insight", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/stillness/800/400\" alt=\"寂静\"></div>\n\n你发现，你拼命想要控制的，从来都不是项目，而是你脑海中的\"投射\"。\n那个项目是无数因缘汇聚的结果，你竟然妄想凭一己之力去修改轨迹。\n\n<<set $awakening += 8>>\\\n<<set $anxiety -= 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +8，安全焦虑值下降 -5</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[体悟\"缘起性空\"的哲学真相->Act4_Emptiness_Realization]]\n[[尝试彻底放下\"项目负责人\"的身份执着->Act4_Identity_Shift]]\n", "tags": []}, {"pid": 51, "name": "Act4_Emptiness_Realization", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/emptiness/800/400\" alt=\"空性\"></div>\n\n你悟到了：这个项目，并没有任何一个可以被你永久抓牢的\"实体\"。\n鼎盛的违约是缘起，老陈的抵触是缘起。当因缘离散，项目便瓦解。\n\n<<set $awakening += 10>>\\\n<<set $anxiety -= 10>>\\\n<<set $power -= 10>>\\\n<<set $greed -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，所有负面值下降 -10</div>\n\n<<if $awakening gte 55>>\\\n<div class=\"awakening-alert\">\n💡 空性的智慧开始显现……\n你看到了事物的本质。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[正式将\"成瘾\"降级为\"偏好\"->Act4_Preference_Path]]\n[[深深吸入这片看破幻象后的清凉->Act4_Awakening_Moment]]\n", "tags": []}, {"pid": 52, "name": "Act4_Price_Of_Control", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/control/800/400\" alt=\"控制\"></div>\n\n你回想起自己的暴怒。那是\"权力中心\"在作祟。\n你以为权力是铠甲，现在发现，它是囚禁你灵魂的铁笼。\n\n<<set $awakening += 8>>\\\n<<set $power -= 15>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +8</div>\n<div class=\"variable-change\">权力欲望值大幅下降 -15</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[看清这个机制，便是解脱的开始->Act4_Identity_Shift]]\n[[对曾经那个面目可憎的自己感到怜悯->Act4_Identity_Shift]]\n", "tags": []}, {"pid": 53, "name": "Act4_Identity_Shift", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/identity/800/400\" alt=\"身份\"></div>\n\n既然没有一个实有的外部世界可被掌控，那么那个拼命想要掌控的\"我\"，又是谁？\n它不过是五蕴堆聚出的一个虚幻中心。\n\n<<set $awakening += 10>>\\\n<<set $power -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10，权力欲望值下降 -10</div>\n\n<<if $awakening gte 60>>\\\n<div class=\"awakening-alert\">\n💡 自我的瓦解带来自由……\n你正在接近觉醒的核心。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[迈向意识觉醒的下一步->Act4_Preference_Path]]\n[[在自我的瓦解中感受前所未有的自由->Act4_Preference_Path]]\n", "tags": []}, {"pid": 54, "name": "Act4_Preference_Path", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/preference/800/400\" alt=\"偏好\"></div>\n\n你可以选择\"偏好\"项目的成功。它依然值得努力，但不再值得用命去换。\n即使失败，你的内在宁静也毫发无损。\n\n<<set $awakening += 5>>\\\n<<set $anxiety -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5，安全焦虑值下降 -10</div>\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[准备迎接最后的\"路径\"修持->Act4_Awakening_Moment]]\n[[在这份新生的理智中寻找宁静->Act4_Awakening_Moment]]\n", "tags": []}, {"pid": 55, "name": "Act4_Awakening_Moment", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/awakening/800/400\" alt=\"觉醒\"></div>\n\n你站直了身体。感到一种前所未有的轻盈。\n你在废弃报告背后写下一行字：\"境遇是幻，觉知是真。\"\n\n<<set $awakening += 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值大幅上升 +10</div>\n\n<<if $awakening gte 70>>\\\n<div class=\"awakening-alert\">\n💡 你已经完成了意识的转变……\n觉醒的时刻已经到来。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n当前状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[带上这份觉知，进入最后一幕->Act5_Start]]\n[[整理好心情，准备面对最后的残局->Act5_Start]]\n", "tags": []}, {"pid": 56, "name": "Act5_Start", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/sunrise/800/400\" alt=\"黎明\"></div>\n\n最后一次走进公司大堂。你的心跳平稳。\n你知道，即便今天等待你的是职业放逐，你的内在宁静也由于\"控制二分法\"而坚如磐石。\n\n<<if $awakening gte 70>>\\\n你感到一种深刻的平静与自由。你已经觉醒。\n<<elseif $awakening gte 50>>\\\n你感到平静与焦虑交织，但你正在学会接纳。\n<<else>>\\\n你依然有些紧张，但你知道这不再是终点。\n<</if>>\\\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[进入办公室，做最后的物品整理->Act5_The_Desk]]\n[[在走廊里感受阳光，等待交接开始->Act5_The_Desk]]\n", "tags": []}, {"pid": 57, "name": "Act5_The_Desk", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/plant/800/400\" alt=\"绿植\"></div>\n\n你细心地浇灌绿植。这个动作里没有焦虑，只有当下的觉知。\n法务部小李推门进来：\"大家都在会议室等你。\"\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[拿起纸箱，带着尊严走向会议室->Act5_The_Confrontation]]\n[[对小李报以一个平静的微笑->Act5_The_Confrontation]]\n", "tags": []}, {"pid": 58, "name": "Act5_The_Confrontation", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/meeting/800/400\" alt=\"会议室\"></div>\n\n会议室里气氛剑拔弩张。你运用了路径三：欣然接受这个机会。\n你看着老陈，心中没有敌意，只有理解。\n\n<<if $power lte 20>>\\\n你的权力欲望已经降到最低，你不再需要控制任何人。\n<<elseif $power lte 40>>\\\n你的权力欲望已经大大降低，你学会了放下。\n<<else>>\\\n你依然有些想证明自己，但你知道这已经不重要了。\n<</if>>\\\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[平静而坦诚地开始最后的陈述->Act5_The_Report]]\n[[选择先对老陈表达真诚的谢意->Act5_Path_10_Love]]\n", "tags": []}, {"pid": 59, "name": "Act5_The_Report", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/speech/800/400\" alt=\"陈述\"></div>\n\n\"我负全部管理责任。\"全场肃然。你不再试图掌控结果。\n你详尽地列出了残局挽回方案。主席眼神中闪过一丝诧异。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（承担责任）</div>\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[完成陈述，等待委员会的最终宣判->Act5_The_Verdict]]\n[[补充说明项目背后的\"缘起\"风险分析->Act5_The_Verdict]]\n", "tags": []}, {"pid": 60, "name": "Act5_Path_10_Love", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/handshake/800/400\" alt=\"握手\"></div>\n\n\"老陈，谢谢你指出的风险，我当时太想证明自己，忽略了你的专业。\"\n这是路径十：通过联系而不是通过操纵。老陈愣住了，戾气竟消失了。\n\n<<set $awakening += 10>>\\\n<<set $power -= 10>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +10，权力欲望值下降 -10</div>\n\n<<if $awakening gte 80>>\\\n<div class=\"awakening-alert\">\n💡 爱与联系的力量……\n你已经超越了控制，学会了真正的关系。\n</div>\n<</if>>\\\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[在缓和的气氛中继续完成交接->Act5_The_Report]]\n[[坦然面对接下来可能发生的任何变动->Act5_The_Report]]\n", "tags": []}, {"pid": 61, "name": "Act5_The_Verdict", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/verdict/800/400\" alt=\"判决\"></div>\n\n主席宣布：接受你的离职申请，不进行行业通报，并保留顾问身份。\n那个三亿的项目，按你的新思路交给老陈负责。你感到一种解脱。\n\n<<set $awakening += 5>>\\\n<div class=\"variable-change positive\">✨ 觉醒值上升 +5（接受结果）</div>\n\n<div class=\"variable-bar\">\n最终状态：焦虑<$anxiety> | 贪婪<$greed> | 权力<$power> | 觉醒<$awakening>\n</div>\n\n[[大方地与主席和老陈握手告别->Act5_Walking_Out]]\n[[在走出会议室前最后看一眼那张蓝图->Act5_Walking_Out]]\n", "tags": []}, {"pid": 62, "name": "Act5_Walking_Out", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/freedom/800/400\" alt=\"自由\"></div>\n\n你抱着纸箱走在街上。微风吹过，路边的花香如此真切。\n你赢回了你自己。你正践行着路径十二：在每一个生命瞬间都体验到觉知。\n\n<div class=\"final-stats\">\n<h3>🎯 你的觉醒之旅统计</h3>\n<p><strong>最终觉醒值：</strong><$awakening></p>\n<p><strong>最终焦虑值：</strong><$anxiety></p>\n<p><strong>最终贪婪值：</strong><$greed></p>\n<p><strong>最终权力值：</strong><$power></p>\n\n<<if $awakening gte 80>>\\\n<p class=\"awakening-high\">✨ 你已成为真正的觉醒者，掌握了内在自由的钥匙。</p>\n<<elseif $awakening gte 60>>\\\n<p class=\"awakening-medium\">🌱 你已经踏上觉醒之路，继续保持觉知。</p>\n<<elseif $awakening gte 40>>\\\n<p class=\"awakening-low\">💫 觉醒的种子已经种下，需要继续浇灌。</p>\n<<else>>\\\n<p class=\"awakening-seed\">🌱 觉醒的旅程才刚刚开始，继续保持探索。</p>\n<</if>>\\\n\n<<if $anxiety lte 20>>\\\n<p class=\"stat-good\">🧘 你的焦虑已经大大降低，内心平静。</p>\n<<elseif $anxiety gte 80>>\\\n<p class=\"stat-warning\">⚠️ 焦虑值依然较高，建议继续练习接纳。</p>\n<</if>>\\\n\n<<if $power lte 20>>\\\n<p class=\"stat-good\">🌊 权力欲望已放下，你学会了不控制的自由。</p>\n<</if>>\\\n\n<<if $greed lte 20>>\\\n<p class=\"stat-good\">💎 贪婪已消解，你找到了比物质更珍贵的宝藏。</p>\n<</if>>\\\n</div>\n\n[[进入故事的终章：深层解析->Act5_Final_Analysis]]\n[[给自己一个全新的开始，回归生活->Act5_Final_Analysis]]\n", "tags": []}, {"pid": 63, "name": "Act5_Final_Analysis", "content": "<div class=\"scene-image\"><img src=\"https://picsum.photos/seed/enlightenment/800/400\" alt=\"启明\"></div>\n\n【深度疗愈解析】\n\n<<if $awakening gte 80>>\\\n<div class=\"analysis-high\">\n<h3>🌟 觉醒者之路</h3>\n<p>你已经完成了从焦虑到觉醒的完整蜕变。</p>\n<p>你识别了\"安全中心\"的成瘾程序，看透了事物的空性本质，将执念降级为偏好。</p>\n<p>现在，你已从机器人般的情绪模式中解脱，成为了一名真正的觉醒者。</p>\n</div>\n<<elseif $awakening gte 60>>\\\n<div class=\"analysis-medium\">\n<h3>🌱 觉醒之路</h3>\n<p>你已经踏上了觉醒的旅程，并取得了显著进步。</p>\n<p>你开始理解控制欲的本质，学会了在某些时刻放下执念。</p>\n<p>继续保持觉知，觉醒的深度会不断加深。</p>\n</div>\n<<elseif $awakening gte 40>>\\\n<div class=\"analysis-low\">\n<h3>💫 觉醒的种子</h3>\n<p>觉醒的种子已经种下，虽然还需要继续浇灌。</p>\n<p>你已经看到了一些真相，但还需要更多练习来稳定这份觉知。</p>\n<p>每一次选择都是成长的机会。</p>\n</div>\n<<else>>\\\n<div class=\"analysis-seed\">\n<h3>🌱 旅程的开始</h3>\n<p>觉醒的旅程才刚刚开始，你已经迈出了第一步。</p>\n<p>焦虑和执念依然存在，但这正是修行的起点。</p>\n<p>不要放弃，继续探索内在的自由。</p>\n</div>\n<</if>>\\\n\n<div class=\"lesson-summary\">\n<h4>📚 你学到的核心智慧：</h4>\n<ul>\n<li><strong>识别成瘾：</strong>看到\"安全中心\"的程序运作</li>\n<li><strong>看透空性：</strong>体悟万物并无独立自性</li>\n<li><strong>路径实践：</strong>将\"执念\"降级为\"偏好\"</li>\n<li><strong>当下觉知：</strong>在每个瞬间体验自由</li>\n</ul>\n</div>\n\n<div class=\"final-message\">\n<h4>🌺 最后的祝福</h4>\n<p>无论你在这段旅程中选择了什么，你都已经看到了另一种可能。</p>\n<p>焦虑不是敌人，它是指向自由的指南针。</p>\n<p>愿你在现实中，继续保持这份觉知。</p>\n</div>\n\n<p>【全剧终】</p>\n</div>\n\n[[重新开始这段觉醒之旅->Game_Init]]\n[[退出游戏，带着觉知回到现实->Game_Init]]\n", "tags": []}];
+
+const STATE = {
+  anxiety: 50,
+  greed: 50,
+  power: 50,
+  awakening: 0,
+  path: 'unknown'
+};
+
+const START_PASSAGE = 'Game_Init';
+
+function processContent(text) {
+  // Process <<set>> with string
+  text = text.replace(/<<set\s+\$(\w+)\s+to\s+['"]([^'"]+)['"]>>/g, function(m, v, val) {
+    STATE[v] = val;
+    return '';
+  });
+  
+  // Process <<set>> with number
+  text = text.replace(/<<set\s+\$(\w+)\s+to\s+(-?\d+)>>/g, function(m, v, val) {
+    STATE[v] = parseInt(val);
+    return '';
+  });
+  
+  // Process <<set +=>>
+  text = text.replace(/<<set\s+\$(\w+)\s*\+=\s*(-?\d+)>>/g, function(m, v, val) {
+    STATE[v] = Math.max(0, Math.min(100, (STATE[v] || 0) + parseInt(val)));
+    return '';
+  });
+  
+  // Process <<set ->>
+  text = text.replace(/<<set\s+\$(\w+)\s*-=\s*(-?\d+)>>/g, function(m, v, val) {
+    STATE[v] = Math.max(0, Math.min(100, (STATE[v] || 0) - parseInt(val)));
+    return '';
+  });
+  
+  // Process <<if>> conditions (simple)
+  var ifPattern = /<<if\s+\$(\w+)\s+(gte|lte|gt|lt|eq)\s+(\d+)>>([\s\S]*?)(?:<<else>>([\s\S]*?))?<<\/if>>/g;
+  text = text.replace(ifPattern, function(m, v, op, val, ifTrue, ifFalse) {
+    var varVal = STATE[v] || 0;
+    var numVal = parseInt(val);
+    var cond = false;
+    switch(op) {
+      case 'gte': cond = varVal >= numVal; break;
+      case 'lte': cond = varVal <= numVal; break;
+      case 'gt': cond = varVal > numVal; break;
+      case 'lt': cond = varVal < numVal; break;
+      case 'eq': cond = varVal === numVal; break;
+    }
+    return cond ? ifTrue : (ifFalse || '');
+  });
+  
+  // Replace variable references
+  text = text.replace(/<\$(\w+)>/g, function(m, v) { return STATE[v] !== undefined ? STATE[v] : 0; });
+  
+  // Remove line continuations
+  text = text.replace(/\\\n/g, '');
+  
+  // Remove remaining macros
+  text = text.replace(/<<.*?>>/g, '');
+  
+  // Convert wiki links [[text->passage]]
+  text = text.replace(/\[\[([^\]]+)->([^\]]+)\]\]/g, '<a class="choice" data-passage="$2">$1</a>');
+  text = text.replace(/\[\[([^\]]+)\]\]/g, '<a class="choice" data-passage="$1">$1</a>');
+  
+  return text;
+}
+
+function formatParagraphs(text) {
+  var lines = text.split('\n').filter(function(l) { return l.trim(); });
+  var result = [];
+  var currentPara = [];
+  
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var trim = line.trim();
+    if (trim.startsWith('<') && (trim.includes('>') || trim.includes('</'))) {
+      if (currentPara.length) {
+        result.push('<p>' + currentPara.join('<br>') + '</p>');
+        currentPara = [];
+      }
+      result.push(trim);
+    } else {
+      currentPara.push(trim);
+    }
+  }
+  if (currentPara.length) {
+    result.push('<p>' + currentPara.join('<br>') + '</p>');
+  }
+  return result.join('\n');
+}
+
+function renderPassage(name) {
+  var passage = null;
+  for (var i = 0; i < PASSAGES.length; i++) {
+    if (PASSAGES[i].name === name) {
+      passage = PASSAGES[i];
+      break;
+    }
+  }
+  if (!passage) {
+    document.getElementById('story').innerHTML = '<div class="passage"><p>错误：找不到段落 "' + name + '"</p></div>';
+    return;
+  }
+  
+  var content = processContent(passage.content);
+  content = formatParagraphs(content);
+  
+  document.getElementById('story').innerHTML = '<div class="passage">' + content + '</div>';
+  
+  // Add click handlers
+  var links = document.querySelectorAll('.choice');
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener('click', function(e) {
+      e.preventDefault();
+      renderPassage(this.getAttribute('data-passage'));
+      window.scrollTo(0, 0);
+    });
+  }
+}
+
+// Start game
+renderPassage(START_PASSAGE);
+</script>
+</body>
+</html>
