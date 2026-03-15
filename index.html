@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心愈卡境 | 心理学疗愈非线性互动式卡牌游戏</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#F9FBFA',
+                            text: '#4A5568',
+                            light: '#718096',
+                            blue: '#D2E3E3',
+                            pink: '#F6E4E3',
+                            green: '#DFEAE2',
+                            beige: '#FDFBF7'
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(144, 156, 168, 0.15)',
+                        'glass-hover': '0 12px 40px 0 rgba(144, 156, 168, 0.25)',
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #F9FBFA;
+            color: #4A5568;
+            overflow-x: hidden;
+        }
+
+        /* 极浅柔化噪点纹理，提升纸张肌理感 */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            mix-blend-mode: multiply;
+        }
+
+        /* 磨砂玻璃通用类 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(144, 156, 168, 0.1);
+        }
+
+        /* 悬浮卡牌缓慢动画 */
+        @keyframes floating {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1.5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        
+        @keyframes floating-reverse {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(15px) rotate(-1.5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .float-slow {
+            animation: floating 8s ease-in-out infinite;
+        }
+        
+        .float-slow-reverse {
+            animation: floating-reverse 10s ease-in-out infinite;
+        }
+
+        /* 按钮轻缓过渡 */
+        .btn-healing {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-healing:active {
+            transform: scale(0.97);
+        }
+
+        /* 隐藏原生滚动条，美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9FBFA; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D2E3E3; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b5cece; 
+        }
+
+        /* 文本渐变柔和 */
+        .text-gradient-soft {
+            background: linear-gradient(135deg, #6B7280 0%, #4A5568 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans selection:bg-brand-pink selection:text-brand-text">
+
+    <!-- 全局噪点肌理 -->
+    <div class="noise-overlay"></div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-500 glass-panel border-b-0" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100 transition-opacity">
+                <iconify-icon icon="ph:flower-lotus-light" width="28" class="text-brand-text"></iconify-icon>
+                <span class="text-xl font-medium tracking-widest text-brand-text">心愈卡境</span>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-10 text-sm font-medium tracking-wide text-brand-light">
+                <a href="#about" class="hover:text-brand-text transition-colors">关于卡牌</a>
+                <a href="#principles" class="hover:text-brand-text transition-colors">疗愈原理</a>
+                <a href="#experience" class="hover:text-brand-text transition-colors">沉浸体验</a>
+            </div>
+
+            <div>
+                <a href="#cta" class="hidden md:inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-white/80 border border-white shadow-sm hover:shadow-md hover:bg-white text-brand-text text-sm font-medium tracking-wide btn-healing">
+                    开启疗愈之旅
+                </a>
+                <button class="md:hidden text-brand-text p-2">
+                    <iconify-icon icon="ph:list-light" width="24"></iconify-icon>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区 -->
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-bg pt-20">
+        <!-- 柔和图片背景与渐变遮罩 -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=2500&auto=format&fit=crop" alt="Healing Sky" class="w-full h-full object-cover opacity-40 blur-[2px]">
+            <div class="absolute inset-0 bg-gradient-to-b from-brand-bg/60 via-brand-bg/80 to-brand-bg"></div>
+        </div>
+        
+        <!-- Three.js 容器：用于生成光斑与云雾的慢动态效果 -->
+        <div id="canvas-container" class="absolute inset-0 z-0 opacity-60 mix-blend-screen pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            <!-- 文字内容 -->
+            <div class="text-center lg:text-left space-y-8 gs-reveal">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs font-medium tracking-widest text-brand-light mb-4">
+                    <iconify-icon icon="ph:sparkle-light"></iconify-icon>
+                    身心同愈的非线性互动
+                </div>
+                <h1 class="text-5xl lg:text-6xl/tight font-light tracking-wide text-gradient-soft">
+                    在抽牌与聆听间，<br>
+                    <span class="font-medium mt-2 block">遇见内心的宁静。</span>
+                </h1>
+                <p class="text-lg text-brand-light leading-relaxed font-light max-w-lg mx-auto lg:mx-0">
+                    「心愈卡境」是一款结合心理学疗愈机制的非线性互动式卡牌游戏。这里没有输赢，只有温柔的陪伴、沉浸式的自然声效，与解开情绪纠结的每一张指引卡牌。
+                </p>
+                <div class="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start pt-4">
+                    <a href="#experience" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-brand-text text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 btn-healing flex items-center justify-center gap-2 font-medium tracking-wide">
+                        立即体验卡牌
+                        <iconify-icon icon="ph:arrow-right-light" width="18"></iconify-icon>
+                    </a>
+                    <a href="#about" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel hover:bg-white/80 text-brand-text btn-healing flex items-center justify-center font-medium tracking-wide">
+                        了解疗愈原理
+                    </a>
+                </div>
+            </div>
+
+            <!-- 卡牌视觉悬浮区 -->
+            <div class="relative h-[500px] flex items-center justify-center gs-reveal">
+                <!-- 光晕背景 -->
+                <div class="absolute w-72 h-72 bg-brand-blue rounded-full mix-blend-multiply filter blur-[80px] opacity-50 float-slow"></div>
+                <div class="absolute w-72 h-72 bg-brand-pink rounded-full mix-blend-multiply filter blur-[80px] opacity-40 float-slow-reverse ml-32 mt-32"></div>
+                
+                <!-- 卡牌 1 -->
+                <div class="absolute w-64 h-96 glass-panel rounded-3xl p-5 shadow-glass transform -rotate-6 float-slow z-10 flex flex-col items-center justify-between border-t border-l border-white/60 bg-gradient-to-br from-white/60 to-white/20">
+                    <div class="w-full flex justify-between items-center opacity-50">
+                        <iconify-icon icon="ph:star-four-light"></iconify-icon>
+                        <span class="text-xs tracking-widest">NO.01</span>
+                    </div>
+                    <div class="flex-grow flex items-center justify-center">
+                        <div class="w-32 h-32 rounded-full border border-brand-text/10 flex items-center justify-center relative">
+                            <img src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover rounded-full opacity-80" alt="柔和水波">
+                        </div>
+                    </div>
+                    <div class="text-center w-full">
+                        <h3 class="font-medium text-lg tracking-wide">接纳当下</h3>
+                        <p class="text-xs text-brand-light mt-2 font-light">允许一切如其所是地发生。</p>
+                    </div>
+                </div>
+
+                <!-- 卡牌 2 -->
+                <div class="absolute w-64 h-96 glass-panel rounded-3xl p-5 shadow-glass transform rotate-6 float-slow-reverse z-20 mt-16 ml-24 flex flex-col items-center justify-between border-t border-l border-white/80 bg-gradient-to-br from-white/80 to-white/30">
+                    <div class="w-full flex justify-between items-center opacity-50">
+                        <iconify-icon icon="ph:star-four-light"></iconify-icon>
+                        <span class="text-xs tracking-widest">NO.07</span>
+                    </div>
+                    <div class="flex-grow flex items-center justify-center">
+                        <div class="w-32 h-32 rounded-full border border-brand-text/10 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover rounded-full opacity-80" alt="平静沙纹">
+                        </div>
+                    </div>
+                    <div class="text-center w-full">
+                        <h3 class="font-medium text-lg tracking-wide">温柔呼吸</h3>
+                        <p class="text-xs text-brand-light mt-2 font-light">将注意力带回一呼一吸之间。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 关键价值主张区 -->
+    <section id="about" class="py-24 relative z-10 bg-brand-bg">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="text-center mb-16 gs-reveal">
+                <h2 class="text-3xl font-light tracking-wider mb-4">寻回内心的宁静</h2>
+                <div class="w-12 h-px bg-brand-text/20 mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass-panel p-10 rounded-[2rem] hover:shadow-glass-hover transition-all duration-500 hover:-translate-y-1 group gs-reveal">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-blue/30 flex items-center justify-center mb-6 text-brand-text group-hover:scale-110 transition-transform duration-500">
+                        <iconify-icon icon="ph:wind-light" width="28"></iconify-icon>
+                    </div>
+                    <h3 class="text-xl font-medium tracking-wide mb-3">情绪舒缓</h3>
+                    <p class="text-brand-light font-light leading-relaxed text-sm">
+                        基于认知行为疗法（CBT）设计的卡牌语言，通过温和的隐喻与引导，帮助你在焦虑与疲惫时，轻轻解开情绪的结。
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-panel p-10 rounded-[2rem] hover:shadow-glass-hover transition-all duration-500 hover:-translate-y-1 group gs-reveal delay-100">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-pink/30 flex items-center justify-center mb-6 text-brand-text group-hover:scale-110 transition-transform duration-500">
+                        <iconify-icon icon="ph:headphones-light" width="28"></iconify-icon>
+                    </div>
+                    <h3 class="text-xl font-medium tracking-wide mb-3">沉浸式聆听</h3>
+                    <p class="text-brand-light font-light leading-relaxed text-sm">
+                        每张卡牌都配有专属的无损白噪音与疗愈频率（如 432Hz 赫兹音频），让耳朵成为通往心灵平静的桥梁。
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-panel p-10 rounded-[2rem] hover:shadow-glass-hover transition-all duration-500 hover:-translate-y-1 group gs-reveal delay-200">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-green/30 flex items-center justify-center mb-6 text-brand-text group-hover:scale-110 transition-transform duration-500">
+                        <iconify-icon icon="ph:plant-light" width="28"></iconify-icon>
+                    </div>
+                    <h3 class="text-xl font-medium tracking-wide mb-3">自然疗愈</h3>
+                    <p class="text-brand-light font-light leading-relaxed text-sm">
+                        视觉系统汲取自然界的低饱和度彩调与柔光肌理，每一次点击、翻转，都如同漫步于晨雾弥漫的森林中一般自在。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 游戏体验介绍区 -->
+    <section id="experience" class="py-24 relative overflow-hidden bg-white">
+        <!-- 装饰性元素 -->
+        <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-radial from-brand-pink/20 to-transparent opacity-50 rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            
+            <!-- 图片互动展示区 -->
+            <div class="relative order-2 lg:order-1 h-[500px] rounded-3xl overflow-hidden group gs-reveal">
+                <img src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90" alt="Healing Stones">
+                <div class="absolute inset-0 bg-brand-text/10 group-hover:bg-transparent transition-colors duration-700"></div>
+                
+                <!-- 悬浮的说明卡片 -->
+                <div class="absolute bottom-8 left-8 right-8 glass-panel p-6 rounded-2xl transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 border-white/40">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center text-brand-text">
+                            <iconify-icon icon="ph:mouse-left-click-light" width="20"></iconify-icon>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-sm">非线性自由探索</h4>
+                            <p class="text-xs text-brand-text/70 mt-1 font-light">没有既定路线，随心翻阅你的专属卡境。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文字说明 -->
+            <div class="order-1 lg:order-2 space-y-8 gs-reveal">
+                <h2 class="text-3xl lg:text-4xl font-light tracking-wide leading-snug">
+                    与自我对话，<br>
+                    <span class="font-medium">不仅是一场游戏。</span>
+                </h2>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="mt-1 text-brand-light/60">01</div>
+                        <div>
+                            <h4 class="text-lg font-medium mb-2">闭上眼睛，抽取指引</h4>
+                            <p class="text-brand-light font-light text-sm leading-relaxed">在充满柔光的卡池中，跟随直觉触碰屏幕。系统将通过缓和的动画为你呈现当下的心灵映射卡。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="mt-1 text-brand-light/60">02</div>
+                        <div>
+                            <h4 class="text-lg font-medium mb-2">沉浸互动，释放压力</h4>
+                            <p class="text-brand-light font-light text-sm leading-relaxed">通过轻滑、擦除、点亮等微小的互动手势，卡牌上的负面词汇将化作飞鸟或晨露消散，带来极强的心理释然感。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="mt-1 text-brand-light/60">03</div>
+                        <div>
+                            <h4 class="text-lg font-medium mb-2">构建你的心灵图鉴</h4>
+                            <p class="text-brand-light font-light text-sm leading-relaxed">被疗愈的情绪将转化为充满生机的植物或光斑，永久保存在你的心灵图鉴中，见证内心的成长与平和。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 疗愈原理区 (极简网格) -->
+    <section id="principles" class="py-24 bg-brand-beige">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center">
+            <h2 class="text-2xl font-light tracking-wider mb-16 gs-reveal">融入日常的心理学智慧</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 gs-reveal">
+                <div class="flex flex-col items-center space-y-4 group">
+                    <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-light group-hover:bg-brand-blue group-hover:text-brand-text transition-all duration-300">
+                        <iconify-icon icon="ph:brain-light" width="28"></iconify-icon>
+                    </div>
+                    <h5 class="font-medium text-sm">认知重评</h5>
+                    <p class="text-xs text-brand-light font-light">转化负面思考视角</p>
+                </div>
+                <div class="flex flex-col items-center space-y-4 group delay-100">
+                    <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-light group-hover:bg-brand-pink group-hover:text-brand-text transition-all duration-300">
+                        <iconify-icon icon="ph:eye-light" width="28"></iconify-icon>
+                    </div>
+                    <h5 class="font-medium text-sm">正念觉察</h5>
+                    <p class="text-xs text-brand-light font-light">安住当下，不加评判</p>
+                </div>
+                <div class="flex flex-col items-center space-y-4 group delay-200">
+                    <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-light group-hover:bg-brand-green group-hover:text-brand-text transition-all duration-300">
+                        <iconify-icon icon="ph:hand-heart-light" width="28"></iconify-icon>
+                    </div>
+                    <h5 class="font-medium text-sm">自我慈悲</h5>
+                    <p class="text-xs text-brand-light font-light">像对待好友般善待自己</p>
+                </div>
+                <div class="flex flex-col items-center space-y-4 group delay-300">
+                    <div class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-light group-hover:bg-brand-blue group-hover:text-brand-text transition-all duration-300">
+                        <iconify-icon icon="ph:waves-light" width="28"></iconify-icon>
+                    </div>
+                    <h5 class="font-medium text-sm">声音疗愈</h5>
+                    <p class="text-xs text-brand-light font-light">白噪音与特定频率共振</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最终行动区 CTA -->
+    <section id="cta" class="relative py-32 overflow-hidden flex items-center justify-center bg-brand-bg">
+        <!-- 柔和图片背景与渐变遮罩 -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop" alt="Calm Beach" class="w-full h-full object-cover opacity-20 blur-sm">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-bg via-brand-bg/60 to-brand-bg"></div>
+        </div>
+
+        <div class="relative z-10 text-center max-w-2xl mx-auto px-6 gs-reveal">
+            <iconify-icon icon="ph:flower-lotus-light" width="40" class="text-brand-light/50 mb-6 mx-auto block"></iconify-icon>
+            <h2 class="text-4xl font-light tracking-wide mb-6">准备好聆听内心的声音了吗？</h2>
+            <p class="text-brand-light font-light mb-10 text-sm leading-relaxed">
+                无需注册，不需要任何准备。找一个安静的角落，戴上耳机，深呼吸，抽出属于你此刻的第一张疗愈卡。
+            </p>
+            <button class="px-10 py-4 rounded-full bg-brand-text text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 btn-healing text-lg font-medium tracking-wide flex items-center justify-center gap-3 mx-auto">
+                免费试玩体验
+                <iconify-icon icon="ph:play-circle-light" width="22"></iconify-icon>
+            </button>
+            <p class="text-xs text-brand-light/60 mt-6 font-light">建议佩戴耳机获取沉浸式体验</p>
+        </div>
+    </section>
+
+    <!-- 页尾 -->
+    <footer class="bg-brand-bg border-t border-brand-text/5 py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-70">
+                <iconify-icon icon="ph:flower-lotus-light" width="20"></iconify-icon>
+                <span class="text-sm font-medium tracking-widest">心愈卡境</span>
+            </div>
+            
+            <div class="flex gap-6 text-xs text-brand-light font-light">
+                <a href="#" class="hover:text-brand-text transition-colors">隐私政策</a>
+                <a href="#" class="hover:text-brand-text transition-colors">用户协议</a>
+                <a href="#" class="hover:text-brand-text transition-colors">联系我们</a>
+            </div>
+            
+            <div class="text-xs text-brand-light/50 font-light">
+                &copy; 2026 心愈卡境 Healing Realm. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- 脚本逻辑 -->
+    <script>
+        // 1. 导航栏滚动模糊效果控制
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2', 'bg-white/70');
+                navbar.classList.remove('py-4', 'bg-white/20', 'border-transparent');
+            } else {
+                navbar.classList.add('py-4', 'bg-white/20', 'border-transparent');
+                navbar.classList.remove('py-2', 'bg-white/70');
+            }
+        });
+
+        // 2. GSAP 滚动出现动画 (柔和淡入)
+        gsap.registerPlugin(ScrollTrigger);
+        
+        const revealElements = document.querySelectorAll(".gs-reveal");
+        revealElements.forEach((elem) => {
+            gsap.fromTo(elem, 
+                { autoAlpha: 0, y: 30 }, 
+                { 
+                    duration: 1.2, 
+                    autoAlpha: 1, 
+                    y: 0, 
+                    ease: "power2.out", 
+                    scrollTrigger: {
+                        trigger: elem,
+                        start: "top 85%", 
+                        toggleActions: "play none none reverse"
+                    }
+                }
+            );
+        });
+
+        // 3. Three.js 柔光粒子背景 (优化性能版)
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            
+            // 相机设置
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // 渲染器设置（背景透明，抗锯齿）
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // 限制像素比提升性能
+            container.appendChild(renderer.domElement);
+
+            // 创建柔和模糊发光球体
+            const particles = new THREE.Group();
+            scene.add(particles);
+
+            const colors = [0xD2E3E3, 0xF6E4E3, 0xDFEAE2, 0xFDFBF7]; // 莫兰迪品牌色
+            
+            // 使用自定义着色器实现极其柔和的边缘发光效果，无需繁重的后处理
+            const vertexShader = `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+            
+            const fragmentShader = `
+                uniform vec3 color;
+                varying vec2 vUv;
+                void main() {
+                    // 计算到中心的距离
+                    float dist = distance(vUv, vec2(0.5));
+                    // 极度柔和的径向渐变，边缘完全透明
+                    float alpha = smoothstep(0.5, 0.0, dist);
+                    gl_FragColor = vec4(color, alpha * 0.4); // 整体透明度降低，更柔和
+                }
+            `;
+
+            // 生成 15 个大块柔光斑
+            for (let i = 0; i < 15; i++) {
+                const geometry = new THREE.PlaneGeometry(15, 15);
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        color: { value: new THREE.Color(colors[Math.floor(Math.random() * colors.length)]) }
+                    },
+                    vertexShader: vertexShader,
+                    fragmentShader: fragmentShader,
+                    transparent: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particle = new THREE.Mesh(geometry, material);
+                
+                // 随机分布在视野内
+                particle.position.x = (Math.random() - 0.5) * 60;
+                particle.position.y = (Math.random() - 0.5) * 40;
+                particle.position.z = (Math.random() - 0.5) * 20;
+                
+                // 随机缩放
+                const scale = Math.random() * 1.5 + 0.5;
+                particle.scale.set(scale, scale, 1);
+                
+                // 给每个粒子附加随机运动参数
+                particle.userData = {
+                    speedX: (Math.random() - 0.5) * 0.02,
+                    speedY: (Math.random() - 0.5) * 0.02,
+                    phase: Math.random() * Math.PI * 2
+                };
+
+                particles.add(particle);
+            }
+
+            // 动画循环
+            const clock = new THREE.Clock();
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const elapsedTime = clock.getElapsedTime();
+
+                // 缓慢移动光斑，制造呼吸感
+                particles.children.forEach((p, index) => {
+                    p.position.x += p.userData.speedX;
+                    p.position.y += Math.sin(elapsedTime * 0.5 + p.userData.phase) * 0.01;
+                    
+                    // 边界回弹/循环
+                    if(p.position.x > 35) p.position.x = -35;
+                    if(p.position.x < -35) p.position.x = 35;
+                });
+
+                // 整体缓慢旋转
+                particles.rotation.z = elapsedTime * 0.02;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // 响应窗口调整
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // 初始化
+        window.onload = () => {
+            initThreeJS();
+        };
+
+    </script>
+</body>
+</html>
